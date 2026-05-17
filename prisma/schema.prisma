@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model atendimentos {
+  atendimento_id    String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  servico_id        String         @db.Uuid
+  valor_atendimento Decimal        @db.Decimal(10, 2)
+  metodo_pagamento  tipo_pagamento
+  criado_em         DateTime       @default(now()) @db.Timestamptz(6)
+  servicos          servicos       @relation(fields: [servico_id], references: [servico_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model servicos {
+  servico_id    String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome_servico  String         @unique @db.VarChar(80)
+  valor_servico Decimal        @db.Decimal(10, 2)
+  atendimentos  atendimentos[]
+}
+
+enum tipo_pagamento {
+  PIX
+  CARTAO
+  DINHEIRO
+}
